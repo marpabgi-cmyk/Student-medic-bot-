@@ -7,8 +7,8 @@ from openai import OpenAI
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
-bot = telebot.TeleBot(TELEGRAM_TOKEN, threaded=False)
-client = OpenAI(api_key=OPENAI_API_KEY)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 
 app = Flask(__name__)
 
