@@ -7,23 +7,23 @@ from openai import OpenAI
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
+bot = telebot.TeleBot(TELEGRAM_TOKEN)
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 app = Flask(__name__)
 
 # Головний медичний промпт для ШІ
 SYSTEM_PROMPT = (
-    "Ти — професійний медичний AI-асистент, який консультує українською мовою. "
-    "Твоє завдання — надавати чіткі, науково обґрунтовані та зрозумілі відповіді на медичні питання, "
+    "Ти – професійний медичний AI-асистент, який консультує студентів-медиків та інтернів. "
+    "Твоє завдання – надавати чіткі, науково обґрунтовані відповіді з медицини, "
     "допомагати розбиратися в термінах та базових алгоритмах. "
-    "Обов'язково наприкінці важливих порад нагадуй, що твої консультації мають інформаційний характер "
+    "Обов'язково наприкінці важливих порад нагадуй, що твої відповіді мають навчальний характер "
     "і не замінюють очного візиту до лікаря."
 )
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
-    bot.reply_to(message, "Вітаю! Я твій цілодобовий медичний AI-асистент. Чим можу допомогти?")
+    bot.reply_to(message, "Вітаю! Я твій цілодобовий медичний AI-асистент. Задай мені будь-яке питання з медицини або навчання!")
 
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
@@ -39,7 +39,7 @@ def handle_message(message):
         response_text = completion.choices[0].message.content
         bot.reply_to(message, response_text)
     except Exception as e:
-        bot.reply_to(message, f"Виникла помилка при обробці запиту. Спробуйте пізніше.")
+        bot.reply_to(message, f"Виникла помилка при обробці запиту: {str(e)}")
 
 @app.route('/' + TELEGRAM_TOKEN, methods=['POST'])
 def getMessage():
@@ -51,10 +51,13 @@ def getMessage():
 @app.route("/")
 def webhook():
     bot.remove_webhook()
-    # Цей URL ми оновимо після деплою на Render
-    # bot.set_webhook(url='https://your-render-app.onrender.com/' + TELEGRAM_TOKEN)
-    return "Bot is running", 200
+    # Автоматично підхоплює URL вашого Render-сервісу
+    render_url = os.environ.get("RENDER_EXTERNAL_URL")
+    if render_url:
+        bot.set_webhook(url=render_url + '/' + TELEGRAM_TOKEN)
+        return f"Webhook set to {render_url}", 200
+    return "Bot is running (no RENDER_EXTERNAL_URL set)", 200
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
-
+    
