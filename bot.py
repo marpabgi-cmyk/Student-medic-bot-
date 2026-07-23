@@ -9,7 +9,8 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 RENDER_EXTERNAL_URL = os.environ.get("RENDER_EXTERNAL_URL")
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
-client = OpenAI(api_key=OPENAI_API_KEY)
+client = OpenAI(api_key=OPENAI_API_KEY, http_client=None)
+
 
 app = Flask(__name__)
 
