@@ -37,11 +37,14 @@ def run_bot():
             bot_reply = response.choices[0].message.content
             bot.reply_to(message, bot_reply)
         except Exception as e:
+            # Виводимо точну помилку в консоль Render для відладки
             print(f"Error handling message: {e}")
             bot.reply_to(message, "Вибачте, виникла помилка при обробці вашого запиту.")
 
     print("Telegram bot started polling...")
-    bot.infinity_polling()
+    # Очищаємо вебхуки та запускаємо сумісний режим
+    bot.remove_webhook()
+    bot.infinity_polling(skip_pending_updates=True)
 
 # 3. Запуск у двох потоках
 if __name__ == "__main__":
