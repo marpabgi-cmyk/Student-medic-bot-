@@ -44,5 +44,13 @@ def run_bot():
     bot.infinity_polling()
 
 # 3. Запуск у двох потоках
+if __name__ == "__main__":
+    # Запускаємо Telegram-бота в окремому потоці
+    bot_thread = threading.Thread(target=run_bot, daemon=True)
+    bot_thread.start()
 
+    # Запускаємо Flask-сервер для Render
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
+    
         
