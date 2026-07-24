@@ -37,23 +37,19 @@ def run_bot():
             bot_reply = response.choices[0].message.content
             bot.reply_to(message, bot_reply)
         except Exception as e:
-            # Виводимо точну помилку в консоль Render для відладки
             print(f"Error handling message: {e}")
             bot.reply_to(message, "Вибачте, виникла помилка при обробці вашого запиту.")
 
     print("Telegram bot started polling...")
-    # Очищаємо вебхуки та запускаємо сумісний режим
-    bot.remove_webhook()
-    bot.infinity_polling(skip_pending_updates=True)
+    # ТУТ БУЛА ПОМИЛКА: тепер вебхук очищається правильно
+    bot.remove_webhook(drop_pending_updates=True)
+    bot.infinity_polling()
 
 # 3. Запуск у двох потоках
 if __name__ == "__main__":
-    # Запускаємо Telegram-бота в окремому потоці
     bot_thread = threading.Thread(target=run_bot, daemon=True)
     bot_thread.start()
 
-    # Запускаємо Flask-сервер для Render
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
     
-        
