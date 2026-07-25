@@ -17,7 +17,7 @@ def run_bot():
     openai_api_key = os.getenv("OPENAI_API_KEY")
 
     if not telegram_token or not openai_api_key:
-        print("ПОМИЛКА: Перевірте змінні оточення (TELEGRAM_TOKEN або OPENAI_API_KEY не знайдені)!")
+        print("ПОМИЛКА: Перевірте змінні оточення (TELEGRAM_TOKEN або OPENAI_API_KEY)!")
         return
 
     bot = telebot.TeleBot(telegram_token)
@@ -26,11 +26,10 @@ def run_bot():
     @bot.message_handler(func=lambda message: True)
     def handle_message(message):
         try:
-            # Запит до OpenAI GPT-4o-mini
             response = client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[
-                    {"role": "system", "content": "Ти — професійний медичний асистент 'Студент-Медик'. Відповідай чітко, структуровано та українською мовою."},
+                    {"role": "system", "content": "Ти медичний помічник для студентів."},
                     {"role": "user", "content": message.text}
                 ]
             )
@@ -38,18 +37,17 @@ def run_bot():
             bot.reply_to(message, bot_reply)
         except Exception as e:
             print(f"Error handling message: {e}")
-            bot.reply_to(message, "Вибачте, виникла помилка при обробці вашого запиту.")
+            bot.reply_to(message, f"❌ Помилка при виконанні: {str(e)}")
 
     print("Telegram bot started polling...")
-    # ТУТ БУЛА ПОМИЛКА: тепер вебхук очищається правильно
     bot.remove_webhook(drop_pending_updates=True)
     bot.infinity_polling()
 
 # 3. Запуск у двох потоках
 if __name__ == "__main__":
-    bot_thread = threading.Thread(target=run_bot, daemon=True)
+    bot_thread = threading.Thread(target=run_bot)
     bot_thread.start()
 
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
-    
+                     
