@@ -40,7 +40,7 @@ def run_bot():
             bot.reply_to(message, f"❌ Помилка при виконанні: {str(e)}")
 
     print("Telegram bot started polling...")
-    bot.remove_webhook(drop_pending_updates=True)
+    bot.remove_webhook()
     bot.infinity_polling()
 
 # 3. Запуск у двох потоках
